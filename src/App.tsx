@@ -1,23 +1,15 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import {env} from "./config/env";
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h1>App Loader Url: {env.appLoaderUrl}</h1>
+        <h2>Api Url: {env.apiUrl}</h2>
       </header>
     </div>
   );
