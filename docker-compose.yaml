@@ -1,0 +1,12 @@
+ version: "3.7"
+
+ services:
+   react-app-runtime-env:
+     build:
+       context: ./
+       dockerfile: Dockerfile
+     environment:
+       - REACT_APP_API_URL=https://some-api-host.com
+       - REACT_APP_APP_LOADER_URL=https://some-app-loader-url.com
+     ports:
+       - "3000:80"
