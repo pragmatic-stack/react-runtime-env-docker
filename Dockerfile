@@ -1,19 +1,18 @@
-FROM node:alpine as builder
+FROM node:16.17.1-alpine as builder
 WORKDIR "/app"
 COPY ./package.json ./
 RUN npm i
 COPY . .
 RUN npm run build
 
-FROM nginx:1.19.7-alpine
+FROM nginx:1.19-alpine
 
 COPY ./nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=builder /app/build /usr/share/nginx/html
-COPY docker/docker-entypoint.d/* /docker-entrypoint.d/
 
-EXPOSE 3000
+# Add the script to write env.js to the entrypoint
+COPY docker/docker-entrypoint.d/set-env.sh /docker-entrypoint.d/
+
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
-
-
-#https://www.freecodecamp.org/news/how-to-implement-runtime-environment-variables-with-create-react-app-docker-and-nginx-7f9d42a91d70/
