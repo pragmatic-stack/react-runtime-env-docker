@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-OUTPUT_FILE=./env.js
+OUTPUT_FILE=/usr/share/nginx/html/env.js
 
 rm $OUTPUT_FILE
 touch $OUTPUT_FILE

@@ -5,6 +5,9 @@ const envSkeleton: Environment = {
     appLoaderUrl: undefined
 }
 
+export const WINDOW_CONFIG_NOT_SET_ERROR_MSG = 'Window environment config is not set!';
+export const WINDOW_CONFIG_MISSING_CONFIG_KEY_MSG = (key: string) => `Your runtime env configuration is invalid. Key: ${key} is not set`;
+
 export const env: Required<Environment> = (() => {
     if(process.env.NODE_ENV === "development"){
         return {
@@ -15,12 +18,12 @@ export const env: Required<Environment> = (() => {
         const windowEnv = window.__env__;
 
         if(!windowEnv){
-            throw new Error('Window environment config is not set!')
+            throw new Error(WINDOW_CONFIG_NOT_SET_ERROR_MSG)
         }
 
         Object.keys(envSkeleton).forEach(k => {
             if(!windowEnv[k as keyof typeof windowEnv]){
-                throw new Error(`Your runtime env configuration is invalid. Key: ${k} is not set`)
+                throw new Error(WINDOW_CONFIG_MISSING_CONFIG_KEY_MSG(k))
             }
         })
 
