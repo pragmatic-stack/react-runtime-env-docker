@@ -4,7 +4,13 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Prerequisites
 
-For this approach to work, nginx image is used in v1.19.-alpine.
+A simple setup to configure your react apps with runtime variables given to your containers.
+
+- build your image once ⏱️
+- deploy your app everywhere 🚀
+
+For the approach of this project to work, nginx image is used in v1.19.-alpine.
+
 We can profit utilizing the docker.entrypoint.d to start our script for the runtime env configuration on container start.
 
 ## Configuration of your app | changes
@@ -52,7 +58,7 @@ To write the contents of your container env variables into the js file that will
 
 In the example provided in `docker/docker-entrypoint.d/set-env.sh`, we only read prefixed REACT_APP variables and expose them to the public.
 
-NOTE: You should not expose any other variables due to security concerns.
+NOTE: ⚠️ You should not expose any other variables due to security concerns.
 
 ### 4. Dockerfile adjustments
 The provided Dockerfile example is a simple multistage build of your react app served by nginx v.1.19.
