@@ -3,16 +3,19 @@ import logo from './logo.svg';
 import './App.css';
 import {appConfig} from "./config/appConfig";
 
+const Config: React.FC = () => {
+    return <>{Object.entries(appConfig).map(([key, value]) => (<h2 key={key}>{key}: {value}</h2>))}</>
+}
+
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1>App Loader Url: {appConfig.REACT_APP_APP_LOADER_URL}</h1>
-        <h2>Api Url: {appConfig.REACT_APP_API_URL}</h2>
-      </header>
-    </div>
-  );
+    return (
+        <div className="App">
+            <header className="App-header">
+                <img src={logo} className="App-logo" alt="logo"/>
+                <Config/>
+            </header>
+        </div>
+    );
 }
 
 export default App;

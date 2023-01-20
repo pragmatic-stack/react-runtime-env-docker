@@ -1,3 +1,6 @@
+/**
+ * The localEnv needs to be adjusted to your app config setup
+ */
 const localEnv = {
     REACT_APP_API_URL: process.env.REACT_APP_API_URL ||  "http://localhost:8000",
     REACT_APP_APP_LOADER_URL: process.env.REACT_APP_APP_LOADER_URL || "http://localhost:3000"

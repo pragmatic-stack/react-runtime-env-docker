@@ -1,46 +1,79 @@
-# Getting Started with Create React App
+# React Runtime Env Docker
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Prerequisites
 
-In the project directory, you can run:
+For this approach to work, nginx image is used in v1.19.-alpine.
+We can profit utilizing the docker.entrypoint.d to start our script for the runtime env configuration on container start.
 
-### `npm start`
+## Configuration of your app | changes
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Config helper for local and runtime configuration
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+To read the configuration for your app, `src/config/appConfig.ts` exports a util `appConfig` that either contains your local configuration or the runtime configuration for your app.
 
-### `npm test`
+For this example we are using TypeScript. All of the configuration is located within that, env variable names are used from your localConfig object to maintain type safety during development.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+You can access your configuration like this: `appConfig.REACT_APP_<VARIABLE>`
 
-### `npm run build`
+### Type definition for your runtime env
+```typescript
+// window.d.ts
+import {RuntimeEnvConfig} from "../config/appConfig";
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+declare global {
+    interface Window {
+        __env__?: RuntimeEnvConfig
+    }
+}
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Steps needed to let this work in your project
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 1. Empty env.js file in your public dir
+For runtime environments, we will overwrite this `public/env.js` file within the nginx serve folder of your app.
 
-### `npm run eject`
+```javascript
+// ./public/env.js
+window.__env__ = {}
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### 2. Script tag in your index.html file
+Add a script tag to your `./public/index.html` head to load the env.js file that will contain our runtime configuration.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```html
+<!-- runtime env config -->
+<script src="%PUBLIC_URL%/env.js"></script>
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### 3. Add the set-env.sh script file in your project
+To write the contents of your container env variables into the js file that will be delivered to your app for configuration, we need the sh script to read your environment configuration.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+In the example provided in `docker/docker-entrypoint.d/set-env.sh`, we only read prefixed REACT_APP variables and expose them to the public.
 
-## Learn More
+NOTE: You should not expose any other variables due to security concerns.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 4. Dockerfile adjustments
+The provided Dockerfile example is a simple multistage build of your react app served by nginx v.1.19.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+For an environment based configuration to work, we just need to copy the set-env.sh file located in `docker/docker-entrypoint.d/` dir into the entrypoint of your nginx stage.
+
+```dockerfile
+# Add the script to write appConfig.js to the entrypoint
+COPY docker/docker-entrypoint.d/set-env.sh /docker-entrypoint.d/
+```
+With this in place, on container startup all `REACT_APP` prefixed variables are read from your container environment and written in a `env.js` file that will be loaded by your index.html as a script when your app is served.
+
+## Docker | Build and run an example image of this project
+
+**Build:** `docker build -t react-runtime-env-docker .`
+
+**Run:** `docker run -p 3000:80 -e REACT_APP_SOME_ENV=SOME_ENV react-runtime-env-docker`
+
+**Visit:** `localhost:3000` to see your runtime configuration.
+
+## Docker Compose
+**Build:** `docker-compose build --no-cache`
+
+**Spin up:** `docker-compose up -d`
