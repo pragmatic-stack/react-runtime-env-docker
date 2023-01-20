@@ -1,34 +1,42 @@
-import {Environment} from "../types/Environment";
+import {RuntimeEnvConfig} from "../types/RuntimeEnvConfig";
 
-const envSkeleton: Environment = {
+const RuntimeEnvModel: RuntimeEnvConfig = {
     REACT_APP_API_URL: undefined,
     REACT_APP_APP_LOADER_URL: undefined
 }
 
-export const WINDOW_CONFIG_NOT_SET_ERROR_MSG = 'Window environment config is not set!';
-export const WINDOW_CONFIG_MISSING_CONFIG_KEY_MSG = (key: string) => `Your runtime env configuration is invalid. Key: ${key} is not set`;
+type RuntimeEnvKeys = keyof RuntimeEnvConfig;
 
-export const env: Required<Environment> = (() => {
-    if(process.env.NODE_ENV === "development"){
+export const ERROR_MESSAGE = {
+    CONFIG_NOT_SET: 'Runtime environment config is not set. window.__env__ is not available.',
+    MISSING_CONFIG_KEY: (key: RuntimeEnvKeys) => `Your runtime env configuration is invalid. Key: ${key} is not set`
+}
+
+export const env: Required<RuntimeEnvConfig> = (() => {
+    if (process.env.NODE_ENV === "development") {
         return {
             REACT_APP_API_URL: process.env.REACT_APP_API_URL || 'some',
             REACT_APP_APP_LOADER_URL: process.env.REACT_APP_APP_LOADER_URL || 'some'
         }
-    } else {
-        const windowEnv = window.__env__;
+    }
 
-        if(!windowEnv){
-            throw new Error(WINDOW_CONFIG_NOT_SET_ERROR_MSG)
-        }
+    const runtimeEnv = window ? window.__env__ : undefined;
 
-        Object.keys(envSkeleton).forEach(k => {
-            if(!windowEnv[k as keyof typeof windowEnv]){
-                throw new Error(WINDOW_CONFIG_MISSING_CONFIG_KEY_MSG(k))
+    if (runtimeEnv) {
+        // check if configuration is provided as expected
+        Object.keys(RuntimeEnvModel).forEach(k => {
+            if (!runtimeEnv[k as RuntimeEnvKeys]) {
+                throw new Error(ERROR_MESSAGE.MISSING_CONFIG_KEY(k as RuntimeEnvKeys))
             }
         })
 
+        // return the properly configured environment
         return {
             ...window.__env__
-        } as Required<Environment>
+        } as Required<RuntimeEnvConfig>
+
+    } else {
+        throw new Error(ERROR_MESSAGE.CONFIG_NOT_SET)
     }
+
 })();

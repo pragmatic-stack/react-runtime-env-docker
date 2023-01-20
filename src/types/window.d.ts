@@ -1,7 +1,7 @@
-import {Environment} from "./Environment";
+import {RuntimeEnvConfig} from "./RuntimeEnvConfig";
 
 declare global {
     interface Window {
-        __env__?: Environment
+        __env__?: RuntimeEnvConfig
     }
 }
