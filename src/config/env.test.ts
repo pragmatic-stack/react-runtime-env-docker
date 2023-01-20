@@ -7,7 +7,7 @@ describe('environment config', () => {
 
     it('should throw an error if a part of window runtime config is not set', () => {
         window.__env__ = {
-            apiUrl: "http://localhost:8000"
+            REACT_APP_API_URL: "http://localhost:8000"
         };
 
         expect(() => require('./env')).toThrowError(WINDOW_CONFIG_MISSING_CONFIG_KEY_MSG('appLoaderUrl'))
@@ -19,8 +19,8 @@ describe('environment config', () => {
 
     it('should provide a correct env config in runtime environment', () => {
         window.__env__ = {
-            apiUrl: "http://localhost:8000",
-            appLoaderUrl: "http://localhost:3000"
+            REACT_APP_API_URL: "http://localhost:8000",
+            REACT_APP_APP_LOADER_URL: "http://localhost:3000"
         };
 
         expect(() => require('./env').env).toEqual(window.__env__)

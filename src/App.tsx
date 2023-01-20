@@ -8,8 +8,8 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <h1>App Loader Url: {env.appLoaderUrl}</h1>
-        <h2>Api Url: {env.apiUrl}</h2>
+        <h1>App Loader Url: {env.REACT_APP_APP_LOADER_URL}</h1>
+        <h2>Api Url: {env.REACT_APP_API_URL}</h2>
       </header>
     </div>
   );
