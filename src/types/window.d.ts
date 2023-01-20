@@ -1,4 +1,4 @@
-import {RuntimeEnvConfig} from "./RuntimeEnvConfig";
+import {RuntimeEnvConfig} from "../config/appConfig";
 
 declare global {
     interface Window {
