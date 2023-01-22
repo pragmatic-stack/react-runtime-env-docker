@@ -1,19 +1,41 @@
 #!/bin/sh
 
-ENV_FILE=/usr/share/nginx/html/env.js
+# Define the output of the javascript env file
+ENV_JS_FILE=/usr/share/nginx/html/env.js
 
-rm $ENV_FILE
-touch $ENV_FILE
+# Cleanup existing files and create a empty one
+if [ -f $ENV_JS_FILE ]; then
+  rm $ENV_JS_FILE
+fi
 
-echo "window.__env__ = {" >> $ENV_FILE
+touch $ENV_JS_FILE
 
-# loop over filtered appConfig vars prefixed for app
-printenv | grep '^REACT_APP' | while IFS= read -r line; do
-  # get the name and value of REACT_APP prefixed variables
-  value=${line#*=}
-  name=${line%%=*}
+# Define the whitelist of strings, separated by whitespace
+whitelist="REACT_APP BROWSER VITE"
 
-  echo "$name: \"$value\"," >> $ENV_FILE
+# Get the environment variables of the container
+env_vars=$(printenv)
+
+# Initialize the __env__ object
+echo "window.__env__ = {" > $ENV_JS_FILE
+
+# Loop through the whitelist
+for item in $whitelist; do
+    # Extract all environment variables that match the string from the whitelist
+    echo "$env_vars" | grep "^$item" > /tmp/env_var.txt
+
+    while read -r line; do
+
+        # Split the environment variable into a key-value pair
+        key=${line%=*}
+        value=${line#*=}
+
+        # Add the key-value pair to the __env__ object
+        echo "  $key: '$value'," >> $ENV_JS_FILE
+    done < /tmp/env_var.txt
+
+    rm -f /tmp/env_var.txt
 done
 
-echo "}" >> $ENV_FILE
+# Close the __env__ object
+echo "};" >> $ENV_JS_FILE

@@ -6,6 +6,7 @@
        context: ./
        dockerfile: Dockerfile
      environment:
+       - VITE_ENV=Example Vite
        - REACT_APP_SOME=SOME_ENV
        - REACT_APP_API_URL=https://some-api-host.com
        - REACT_APP_APP_LOADER_URL=https://some-app-loader-url.com
