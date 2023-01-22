@@ -1,11 +1,25 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import {appConfig} from "./config/appConfig";
+import {RuntimeEnvironment} from "./config/RuntimeEnvironment";
 
-const Config: React.FC = () => {
-    return <>{Object.entries(appConfig).map(([key, value]) => (<h2 key={key}>{key}: {value}</h2>))}</>
-}
+const env = new RuntimeEnvironment(
+    {
+        REACT_APP_ENV: process.env.REACT_APP_ENV || '',
+        REACT_APP_API_URL: process.env.REACT_APP_API_URL || '',
+        REACT_APP_APP_LOADER_URL: process.env.REACT_APP_APP_LOADER_URL || ''
+    }, {
+        logConfigState: true,
+        logMethod: 'warn'
+    }
+);
+
+const Config: React.FC = () => <>{Object.entries(env.config).map(
+    ([key, value]) => (
+        <h2 key={key}>{key}: {value}</h2>
+    )
+)}</>
+
 
 function App() {
     return (

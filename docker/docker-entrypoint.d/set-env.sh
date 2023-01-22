@@ -1,11 +1,11 @@
 #!/bin/sh
 
-OUTPUT_FILE=/usr/share/nginx/html/env.js
+ENV_FILE=/usr/share/nginx/html/env.js
 
-rm $OUTPUT_FILE
-touch $OUTPUT_FILE
+rm $ENV_FILE
+touch $ENV_FILE
 
-echo "window.__env__ = {" >> $OUTPUT_FILE
+echo "window.__env__ = {" >> $ENV_FILE
 
 # loop over filtered appConfig vars prefixed for app
 printenv | grep '^REACT_APP' | while IFS= read -r line; do
@@ -13,7 +13,7 @@ printenv | grep '^REACT_APP' | while IFS= read -r line; do
   value=${line#*=}
   name=${line%%=*}
 
-  echo "$name: \"$value\"," >> $OUTPUT_FILE
+  echo "$name: \"$value\"," >> $ENV_FILE
 done
 
-echo "}" >> $OUTPUT_FILE
+echo "}" >> $ENV_FILE
